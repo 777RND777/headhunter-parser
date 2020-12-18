@@ -22,16 +22,20 @@ class Salary:
         info = info.split("-")
         if len(info) == 1:
             self.strict_parse(info[0].split())
+            self.kzt = self.coverter(self.top_value)
         else:
             self.range_parse(info)
+            self.kzt = self.coverter(self.bot_value)
 
     def __str__(self):
         if not self.bot_value:
             output = f"{self.top_value} {self.currency}"
+            if self.currency != "KZT":
+                output += f" ({self.kzt} в KZT)"
         else:
-            output = f"от {self.bot_value} до {self.top_value} {self.currency}"
-        if self.kzt:
-            output += f" ({self.kzt} в KZT)"
+            output = f"{self.bot_value} - {self.top_value} {self.currency}"
+            if self.currency != "KZT":
+                output += f" ({self.kzt} - {self.coverter(self.top_value)} в KZT)"
         return output
 
     def strict_parse(self, info):
@@ -48,6 +52,9 @@ class Salary:
         self.bot_value = get_only_digits(info[0].split())
         # second is top
         self.strict_parse(info[1].split())
+
+    def coverter(self, value):
+        return value
 
 
 url = "https://hh.kz/search/vacancy?clusters=true&enable_snippets=true&text=python&L_save_area=true&area=159&from" \
