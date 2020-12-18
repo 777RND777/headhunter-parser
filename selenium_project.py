@@ -25,6 +25,15 @@ class Salary:
         else:
             self.range_parse(info)
 
+    def __str__(self):
+        if not self.bot_value:
+            output = f"{self.top_value} {self.currency}"
+        else:
+            output = f"от {self.bot_value} до {self.top_value} {self.currency}"
+        if self.kzt:
+            output += f" ({self.kzt} в KZT)"
+        return output
+
     def strict_parse(self, info):
         if info[-1].isalpha():
             # TODO currency. example: kzt and KZT to KZT
@@ -64,6 +73,7 @@ for vacancy in vacancies:
             continue
         print(f"Название:\t{name}")
         print(f"Оклад:\t{salary}")
+        print(Salary(salary))
         print()
     except exceptions.NoSuchElementException:
         pass
