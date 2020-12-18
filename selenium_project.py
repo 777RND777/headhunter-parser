@@ -41,13 +41,11 @@ class Salary:
             info = info[:-1]
         else:
             self.currency = "KZT"
-        value = get_only_digits(info)
-        self.top_value = int(value)
+        self.top_value = get_only_digits(info)
 
     def range_parse(self, info):
         # first is bottom
-        value = get_only_digits(info[0].split())
-        self.bot_value = int(value)
+        self.bot_value = get_only_digits(info[0].split())
         # second is top
         self.strict_parse(info[1].split())
 
