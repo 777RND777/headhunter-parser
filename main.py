@@ -34,7 +34,7 @@ def vacancy_processing(v):
 class Salary:
     top_value = 0
     bot_value = 0
-    currency = ""
+    currency = "KZT"
     kzt = 0
 
     def __init__(self, info):
@@ -60,11 +60,8 @@ class Salary:
 
     def strict_parse(self, info):
         if info[-1].isalpha():
-            # TODO currency. example: kzt and KZT to KZT
-            self.currency = info[-1]
+            self.currency = info[-1].upper()
             info = info[:-1]
-        else:
-            self.currency = "KZT"
         self.top_value = get_only_digits(info)
 
     def range_parse(self, info):
