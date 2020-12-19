@@ -15,19 +15,20 @@ def get_only_digits(array):
 
 
 def vacancy_processing(v):
-    name = v.find_element_by_tag_name("a").text
+    link = v.find_element_by_tag_name("a")
+    name = link.text
     for word in avoid_words:
         if word in name.lower():
             return
     salary_info = v.find_element_by_class_name("vacancy-serp-item__sidebar").text
     if not salary_info:
-        # salary = "No information"
         return
     salary = Salary(salary_info)
     if salary.kzt < minimum_salary:
         return
     print(f"Название:   {name}")
-    print(f"Оклад:      {salary}\n")
+    print(f"Оклад:      {salary}")
+    print(f"Ссылка:     {link.get_attribute('href')}\n")
 
 
 class Salary:
