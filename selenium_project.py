@@ -1,3 +1,4 @@
+from kzt_exchangerates import Rates
 from selenium.common import exceptions
 from selenium import webdriver
 
@@ -21,11 +22,12 @@ class Salary:
     def __init__(self, info):
         info = info.split("-")
         if len(info) == 1:
+            # TODO check "от" and "до"
             self.strict_parse(info[0].split())
-            self.kzt = self.coverter(self.top_value)
+            self.kzt = self.exchange(self.top_value)
         else:
             self.range_parse(info)
-            self.kzt = self.coverter(self.bot_value)
+            self.kzt = self.exchange(self.bot_value)
 
     def __str__(self):
         if not self.bot_value:
@@ -35,7 +37,7 @@ class Salary:
         else:
             output = f"{self.bot_value} - {self.top_value} {self.currency}"
             if self.currency != "KZT":
-                output += f" ({self.kzt} - {self.coverter(self.top_value)} в KZT)"
+                output += f" ({self.kzt} - {self.exchange(self.top_value)} в KZT)"
         return output
 
     def strict_parse(self, info):
@@ -53,18 +55,20 @@ class Salary:
         # second is top
         self.strict_parse(info[1].split())
 
-    def coverter(self, value):
-        return value
+    def exchange(self, value):
+        # TODO try to find different way
+        return value * round(rates.get_exchange_rate(self.currency, 'KZT'))
 
 
-url = "https://hh.kz/search/vacancy?clusters=true&enable_snippets=true&text=python&L_save_area=true&area=159&from" \
-      "=cluster_area&showClusters=true "
+rates = Rates()
+url = "https://hh.kz/search/vacancy?area=159&fromSearchLine=true&st=searchVacancy&text=python"
 options = webdriver.ChromeOptions()
 options.headless = True
 driver = webdriver.Chrome("chromedriver.exe", options=options)
 
 driver.get(url)
 table = driver.find_element_by_class_name("vacancy-serp")
+# TODO refactor search
 vacancies = table.find_elements_by_xpath("//*[@class='vacancy-serp-item__row vacancy-serp-item__row_header']")
 
 for vacancy in vacancies:
@@ -77,9 +81,7 @@ for vacancy in vacancies:
             # salary = "No information"
             continue
         print(f"Название:\t{name}")
-        print(f"Оклад:\t{salary}")
-        print(Salary(salary))
-        print()
+        print(f"Оклад:\t{Salary(salary)}")
     except exceptions.NoSuchElementException:
         pass
 driver.quit()
