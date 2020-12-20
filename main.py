@@ -48,13 +48,13 @@ class Salary:
 
     def __str__(self):
         if not self.bot_value:
-            output = f"{self.top_value} {self.currency}"
+            output = f"{self.top_value:,} {self.currency}"
             if self.currency != "KZT":
-                output += f" ({self.kzt} в KZT)"
+                output += f" ({self.kzt:,} в KZT)"
         else:
-            output = f"{self.bot_value} - {self.top_value} {self.currency}"
+            output = f"{self.bot_value:,} - {self.top_value:,} {self.currency}"
             if self.currency != "KZT":
-                output += f" ({self.kzt} - {self.to_kzt(self.top_value)} в KZT)"
+                output += f" ({self.kzt:,} - {self.to_kzt(self.top_value):,} в KZT)"
         return output
 
     def strict_parse(self, info):
