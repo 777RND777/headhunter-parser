@@ -59,8 +59,15 @@ class Salary:
         return output
 
     def strict_parse(self, info):
-        if info[-1].isalpha():
-            self.currency = info[-1].upper()
+        if not info[-1].isdigit():
+            if info[-1].startswith("руб"):
+                self.currency = "RUB"
+            elif info[-1] == "$":
+                self.currency = "USD"
+            elif info[-1] == "€":
+                self.currency = "EUR"
+            else:
+                self.currency = info[-1].upper()
             info = info[:-1]
         self.top_value = get_only_digits(info)
 
@@ -85,7 +92,7 @@ table = driver.find_element_by_class_name("vacancy-serp")
 # TODO refactor search. maybe using css selector
 vacancies = table.find_elements_by_xpath("//*[@class='vacancy-serp-item__row vacancy-serp-item__row_header']")
 
-for vacancy in vacancies:
+for vacancy in vacancies[:2]:
     try:
         vacancy_processing(vacancy)
     except exceptions.NoSuchElementException:
