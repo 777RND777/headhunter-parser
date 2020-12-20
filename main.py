@@ -40,7 +40,6 @@ class Salary:
     def __init__(self, info):
         info = info.split("-")
         if len(info) == 1:
-            # TODO check "от" and "до"
             self.strict_parse(info[0].split())
             self.kzt = self.to_kzt(self.top_value)
         else:
@@ -89,8 +88,7 @@ driver = webdriver.Chrome("chromedriver.exe", options=options)
 
 driver.get(URL)
 table = driver.find_element_by_class_name("vacancy-serp")
-# TODO refactor search. maybe using css selector
-vacancies = table.find_elements_by_xpath("//*[@class='vacancy-serp-item__row vacancy-serp-item__row_header']")
+vacancies = table.find_elements_by_css_selector("div.vacancy-serp-item")
 
 for vacancy in vacancies[:2]:
     try:
