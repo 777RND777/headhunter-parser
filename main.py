@@ -77,7 +77,6 @@ class Salary:
         self.strict_parse(info[1].split())
 
     def to_kzt(self, value):
-        # TODO try to find different way
         return value * round(rates.get_exchange_rate(self.currency, 'KZT'))
 
 
@@ -90,7 +89,7 @@ driver.get(URL)
 table = driver.find_element_by_class_name("vacancy-serp")
 vacancies = table.find_elements_by_css_selector("div.vacancy-serp-item")
 
-for vacancy in vacancies[:2]:
+for vacancy in vacancies:
     try:
         vacancy_processing(vacancy)
     except exceptions.NoSuchElementException:
