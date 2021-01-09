@@ -2,6 +2,7 @@ from consts import *
 from kzt_exchangerates import Rates
 from selenium.common import exceptions
 from selenium import webdriver
+from concurrent.futures import ThreadPoolExecutor
 
 
 class Salary:
@@ -75,27 +76,29 @@ def vacancy_processing(v):
     salary = Salary(salary_info)
     if salary.kzt < MINIMUM_SALARY:
         return
-    print(f"Название:   {name}")
-    print(f"Оклад:      {salary}")
-    print(f"Ссылка:     {link.get_attribute('href')}\n")
+    print(f'''
+Название:   {name}
+Оклад:      {salary}
+Ссылка:     {link.get_attribute('href')}''')
 
 
-def page_collector(url, current, stop):
+def get_next_page():
+    next_page = driver.find_element_by_css_selector("a.bloko-button.HH-Pager-Controls-Next.HH-Pager-Control")
+    url = next_page.get_attribute("href")
+    page_collector(url)
+
+
+def page_collector(url):
     driver.get(url)
     table = driver.find_element_by_class_name("vacancy-serp")
-    vacancies = table.find_elements_by_css_selector("div.vacancy-serp-item")
-
-    for vacancy in vacancies[:-3]:
+    with ThreadPoolExecutor() as executor:
         try:
-            vacancy_processing(vacancy)
+            executor.map(vacancy_processing, table.find_elements_by_css_selector("div.vacancy-serp-item"))
         except exceptions.NoSuchElementException:
             pass
+
     try:
-        next_page = driver.find_element_by_css_selector("a.bloko-button.HH-Pager-Controls-Next.HH-Pager-Control")
-        url = next_page.get_attribute("href")
-        if current > stop:
-            return
-        page_collector(url, current + 1, stop)
+        get_next_page()
     except exceptions.NoSuchElementException:
         pass
 
@@ -105,5 +108,5 @@ if __name__ == "__main__":
     options = webdriver.ChromeOptions()
     options.headless = True
     driver = webdriver.Chrome("chromedriver.exe", options=options)
-    page_collector(START_PAGE, CURRENT_PAGE, STOP_PAGE)
+    page_collector(START_PAGE)
     driver.quit()
