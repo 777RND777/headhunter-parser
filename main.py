@@ -3,21 +3,38 @@ from kzt_exchangerates import Rates
 from selenium.common import exceptions
 from selenium import webdriver
 from concurrent.futures import ThreadPoolExecutor
+import re
+
+
+def get_currency(currency):
+    if not currency.isdigit():
+        if currency.startswith("руб"):
+            return "RUB"
+        elif currency == "$":
+            return "USD"
+        elif currency == "€":
+            return "EUR"
+        else:
+            return currency.upper()
+    return "KZT"
 
 
 class Salary:
     top_value = 0
     bot_value = 0
-    currency = "KZT"
     kzt = 0
 
     def __init__(self, info):
-        info = info.split("-")
-        if len(info) == 1:
-            self.strict_parse(info[0].split())
+        self.currency = get_currency(info.split()[-1])
+        info = [int(i.replace(" ", "")) for i in re.findall(r"\d+ \d+", info)]
+        if not info:
+            return
+        elif len(info) == 1:
+            self.top_value = info[0]
             self.kzt = self.to_kzt(self.top_value)
         else:
-            self.range_parse(info)
+            self.bot_value = info[0]
+            self.top_value = info[1]
             self.kzt = self.to_kzt(self.bot_value)
 
     def __str__(self):
@@ -31,37 +48,8 @@ class Salary:
                 output += f" ({self.kzt:,} - {self.to_kzt(self.top_value):,} в KZT)"
         return output
 
-    def strict_parse(self, info):
-        if not info[-1].isdigit():
-            if info[-1].startswith("руб"):
-                self.currency = "RUB"
-            elif info[-1] == "$":
-                self.currency = "USD"
-            elif info[-1] == "€":
-                self.currency = "EUR"
-            else:
-                self.currency = info[-1].upper()
-            info = info[:-1]
-        self.top_value = get_only_digits(info)
-
-    def range_parse(self, info):
-        # first is bottom
-        self.bot_value = get_only_digits(info[0].split())
-        # second is top
-        self.strict_parse(info[1].split())
-
     def to_kzt(self, value):
         return value * round(rates.get_exchange_rate(self.currency, 'KZT'))
-
-
-def get_only_digits(array):
-    value = ""
-    for a in array:
-        if a.isdigit():
-            value += a
-    if value:
-        return int(value)
-    return 0
 
 
 def vacancy_processing(v):
