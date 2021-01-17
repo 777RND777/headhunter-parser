@@ -26,15 +26,17 @@ class Salary:
 
     def __init__(self, info):
         self.currency = get_currency(info.split()[-1])
-        info = [int(i.replace(" ", "")) for i in re.findall(r"\d+ \d+", info)]
-        if not info:
-            return
-        elif len(info) == 1:
-            self.top_value = info[0]
+        salary_range = [int(i.replace(" ", "")) for i in re.findall(r"\d+ \d+", info)]
+        if not salary_range:
+            salary_range = [int(i.replace(" ", "")) for i in re.findall(r"\d+", info)]
+            if not salary_range:
+                return
+        if len(salary_range) == 1:
+            self.top_value = salary_range[0]
             self.kzt = self.to_kzt(self.top_value)
         else:
-            self.bot_value = info[0]
-            self.top_value = info[1]
+            self.bot_value = salary_range[0]
+            self.top_value = salary_range[1]
             self.kzt = self.to_kzt(self.bot_value)
 
     def __str__(self):
