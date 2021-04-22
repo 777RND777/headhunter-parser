@@ -1,4 +1,4 @@
-from consts import *
+from config import *
 from kzt_exchangerates import Rates
 from selenium.common import exceptions
 from selenium import webdriver
