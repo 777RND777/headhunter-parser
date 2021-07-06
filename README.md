@@ -1,2 +1,2 @@
 Download chromedriver.exe and place it to the project folder.\
-Download link: https://chromedriver.chromium.org/downloads
+Download link: https://sites.google.com/a/chromium.org/chromedriver/downloads
